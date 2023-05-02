@@ -13,6 +13,9 @@ require("./models/Postagem")
 const Postagem = mongoose.model("postagens")
 require('./models/Categoria')
 const Categoria = mongoose.model('categorias')
+const usuarios = require('./routes/usuario')
+const passport = require('passport')
+require('./config/auth')(passport)
 
 
 
@@ -25,6 +28,9 @@ app.use(session({
     saveUninitialized: true,
     // cookie: { secure: true }
 }))
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use(flash())
 // app.use('/admin', router)
 
@@ -32,6 +38,7 @@ app.use(flash())
 app.use((req, res, next) => {
     res.locals.success_msg = req.flash('success_msg')
     res.locals.error_msg = req.flash('error_msg')
+    res.locals.error = req.flash("error")
     next()
 })
 
@@ -111,8 +118,9 @@ app.get('/categorias/:slug', (req, res) => {
         console.log(err)
     })
 })
-
+    
 app.use('/admin', admin)
+app.use('/usuarios', usuarios)
 
 // Outros
 const PORT = 8081
